@@ -2,25 +2,50 @@ from tkinter import *
 import backend
 
 
+def get_selected_row(event):
+    global selected_tuple
+    index = list1.curselection()[0]
+    selected_tuple = list1.get(index)
+    e1.delete(0, END)
+    e1.insert(END, selected_tuple[1])  # title
+    e2.delete(0, END)
+    e2.insert(END, selected_tuple[2])  # author
+    e3.delete(0, END)
+    e3.insert(END, selected_tuple[3])  # year
+    e4.delete(0, END)
+    e4.insert(END, selected_tuple[4])  # isbn
 
 
 def view_command():
-    list1.delete(0,END)
+    list1.delete(0, END)
     for row in backend.view():
-        list1.insert(END,row)
+        list1.insert(END, row)
+
 
 def search_command():
-    list1.delete(0,END)
-    for row in backend.search(title_text.get(),author_text.get(),year_text.get(),isbn_text.get()):
-        list1.insert(END,row)
+    list1.delete(0, END)
+    for row in backend.search(title_text.get(), author_text.get(), year_text.get(), isbn_text.get()):
+        list1.insert(END, row)
+
 
 def add_command():
-    backend.insert(title_text.get(),author_text.get(),year_text.get(),isbn_text.get())
-    list1.delete(0,END)
-    list1.insert(END,(title_text.get(),author_text.get(),year_text.get(),isbn_text.get()))
+    backend.insert(title_text.get(), author_text.get(),
+                   year_text.get(), isbn_text.get())
+    list1.delete(0, END)
+    list1.insert(END, (title_text.get(), author_text.get(),
+                       year_text.get(), isbn_text.get()))
 
+
+def delete_command():
+    backend.delete(selected_tuple[0])
+
+
+def update_command():
+    backend.update(selected_tuple[0], title_text.get(), author_text.get(), year_text.get(), isbn_text.get())
 
 window = Tk()
+
+window.wm_title("BookStore!")
 
 l1 = Label(window, text="Title")
 l1.grid(row=0, column=0)
@@ -59,6 +84,8 @@ sb1.grid(row=2, column=2, rowspan=6)
 list1.configure(yscrollcommand=sb1.set)
 sb1.configure(command=list1.yview)
 
+list1.bind('<<ListboxSelect>>', get_selected_row)
+
 b1 = Button(window, text="View All", width=12, command=view_command)
 b1.grid(row=2, column=3)
 
@@ -68,13 +95,13 @@ b1.grid(row=3, column=3)
 b1 = Button(window, text="Add Entry", width=12, command=add_command)
 b1.grid(row=4, column=3)
 
-b1 = Button(window, text="Update Selected", width=12)
-b1.grid(row=5, column=3)
+b1 = Button(window, text="Update Selected", width=12, command=update_command)
+b1.grid(row=5, column=3)    
 
-b1 = Button(window, text="Delete Selected", width=12)
+b1 = Button(window, text="Delete Selected", width=12, command=delete_command)
 b1.grid(row=6, column=3)
 
-b1 = Button(window, text="Close", width=12)
+b1 = Button(window, text="Close", width=12, command=window.destroy)
 b1.grid(row=7, column=3)
 
 window.mainloop()
